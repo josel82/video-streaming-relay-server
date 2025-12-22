@@ -1,0 +1,17 @@
+# 1. Local provider and module cache 
+.terraform/
+
+# 2. Dependency lock file 
+.terraform.lock.hcl
+
+# 3. State files
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+# 4. Variables files
+*.tfvars
+*.tfvars.json
+
+# 5. Crash logs
+crash.log
