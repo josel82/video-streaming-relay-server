@@ -18,3 +18,9 @@ crash.log
 
 # 6. Private key
 video-relay
+
+# 7. Python Virtual Env
+venv/
+
+# 8. Plan
+srt-relay
