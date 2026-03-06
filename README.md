@@ -1,29 +1,32 @@
 # video-streaming-relay
 
-Terraform configuration to deploy an AWS EC2 instance optimized for video streaming tasks. This setup automatically installs ffmpeg, srt-tools, and librist via a startup script.
+Terraform and Ansible configuration to deploy an AWS EC2 instance optimized for video SRT Streaming. This setup automatically installs srt-tools and creates an "SRT relay" service with the provided parameters. 
 
   
 ## 🚀 Features
 
-- **EC2 Instance**: Deploys a t2.small instance (Amazon Linux/Ubuntu based on AMI).
-- **Video Toolset**: Pre-configured with ffmpeg, srt-tools, and librist.
+- **EC2 Instance**: Deploys a t3.small instance (Amazon Linux/Ubuntu based on AMI).
+- **Video Toolset**: Configured with srt-tools.
+- **Networking**: Creates a VPC on a given Region, subnet, routing table and attaches the EC2 instance to it.
 - **Security**: Automated Security Group creation with specific ingress rules for streaming protocols.
 - **Automated Key Management**: Generates an RSA 4096-bit SSH key pair locally.
 
 ## 🛠 Prerequisites
 
 - Terraform installed.
+- Ansible installed
 - AWS CLI configured with appropriate permissions.
-- An existing VPC in your target AWS region.
 
   
 ## 📂 Project Structure
 
 - `providers.tf`: Defines the plugins that enable Terraform to interact with AWS
-- `ec2.tf`: Defines the instance, security groups, and SSH keys.
-- `variables.tf`: Variable definitions (e.g., vpc_id).
-- `instance-init.sh`: Shell script to install streaming dependencies.
-- `terraform.tfvars`: (Local only) Used to store your specific VPC ID.
+- `ec2.tf`: Defines the instance.
+- `vpc.tf`: Defines VPC, subnet, internet gateway, routing table, security groups, and SSH keys.
+- `ansible/srt-relay`: Ansible playbook which update packet cache, installs srt-tools and creates the "SRT Relay" service.
+- `ansible/inventory.ini`: Contains the IP address of the instance, and define other variables used in the playbook.
+- `ansible/templates/srt-relay.service.j2`: Defines the "SRT Relay" systemd service.
+- `ansible/templates/srt-relay.sh.j2`: Defines the script the systemd service run when started.
 
 ## 🚦 Getting Started
 
@@ -32,24 +35,20 @@ Terraform configuration to deploy an AWS EC2 instance optimized for video stream
 ```bash
 terraform init
 ```
-
   
-2. Configure Variables
+2. Plan the deployment
 
-Create a terraform.tfvars file in the root directory and add your VPC ID:
-
-```terraform
-vpc_id = "vpc-your-id-here"
+```bash
+terraform plan -out=srt-relay
 ```
-
 
 3. Deploy
 
 ```bash
-terraform apply
+terraform apply srt-relay
 ```
 
-4. Access the Instance
+4. Access the Instance (Do this before running the Ansible playbook)
 
 Terraform will generate a local file named video-relay (the private key). Use it to SSH into your instance:
 
@@ -59,10 +58,28 @@ chmod 400 video-relay
 ssh -i "video-relay" ec2-user@<instance-public-ip>
 ```
 
-## 🔒 Security & Ports
+## 🔒 Run Ansible Playbook
 
-The following ports are opened by default:
+1. **Test the connection**:
 
-- 22 (TCP): SSH Access.
-- 5000 (UDP): General Purpose Inbound Stream.
-- 5022 (UDP): Secondary Inbound Stream / Management.
+```bash
+ansible -i inventory.ini srt_relay_servers -m ping
+```
+
+2. **Run the playbook**:
+
+```bash
+ansible-playbook -i inventory.ini srt-relay.yml
+```
+
+**Run with specific user** (if different from ubuntu):
+
+```bash
+ansible-playbook -i inventory.ini srt-relay.yml -u ec2-user
+```
+
+3. **Check service status after deployment**:
+
+```bash
+ansible srt_relay_servers -i inventory.ini -m shell -a "systemctl status srt-relay"
+```
