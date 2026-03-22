@@ -24,7 +24,8 @@ Terraform and Ansible configuration to deploy an AWS EC2 instance optimized for 
 - `ec2.tf`: Defines the instance.
 - `vpc.tf`: Defines VPC, subnet, internet gateway, routing table, security groups, and SSH keys.
 - `ansible/srt-relay`: Ansible playbook which update packet cache, installs srt-tools and creates the "SRT Relay" service.
-- `ansible/inventory.ini`: Contains the IP address of the instance, and define other variables used in the playbook.
+- `ansible/aws_ec2.yml`: AWS Dynamic Inventory.
+- `ansible/ansible.cfg`: Local ansible configuration.
 - `ansible/templates/srt-relay.service.j2`: Defines the "SRT Relay" systemd service.
 - `ansible/templates/srt-relay.sh.j2`: Defines the script the systemd service run when started.
 
@@ -55,7 +56,6 @@ Terraform will generate a local file named video-relay (the private key). Use it
 
 ```bash
 chmod 400 video-relay
-ssh -i "video-relay" ec2-user@<instance-public-ip>
 ```
 
 ## 🔒 Run Ansible Playbook
@@ -63,23 +63,24 @@ ssh -i "video-relay" ec2-user@<instance-public-ip>
 1. **Test the connection**:
 
 ```bash
-ansible -i inventory.ini srt_relay_servers -m ping
+cd ansible
+ansible-inventory -i aws_ec2.yml --graph
 ```
 
 2. **Run the playbook**:
 
 ```bash
-ansible-playbook -i inventory.ini srt-relay.yml
+ansible-playbook -i aws_ec2.yml srt-relay.yml
 ```
 
 **Run with specific user** (if different from ubuntu):
 
 ```bash
-ansible-playbook -i inventory.ini srt-relay.yml -u ec2-user
+ansible-playbook -i aws_ec2.yml srt-relay.yml -u ec2-user
 ```
 
 3. **Check service status after deployment**:
 
 ```bash
-ansible srt_relay_servers -i inventory.ini -m shell -a "systemctl status srt-relay"
+ansible tag_Video_stream_relay -i aws_ec2.yml -m shell -a "systemctl status srt-relay"
 ```

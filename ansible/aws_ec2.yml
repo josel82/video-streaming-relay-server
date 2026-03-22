@@ -1,0 +1,14 @@
+plugin: amazon.aws.aws_ec2
+regions:
+  - eu-west-1  # Specify your region
+profile: terraform-user
+hostvars_prefix: aws_
+
+# Only find instances that are actually running
+filters:
+  instance-state-name: running
+
+# This is the "magic" part: it creates groups based on your AWS Tags
+keyed_groups:
+  - prefix: tag
+    key: aws_tags.Name

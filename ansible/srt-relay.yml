@@ -1,6 +1,6 @@
 ---
 - name: Setup SRT Relay Server
-  hosts: srt_relay_servers
+  hosts: tag_Video_stream_relay
   become: yes
   vars:
     srt_ports:
