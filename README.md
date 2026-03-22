@@ -10,14 +10,14 @@ Terraform and Ansible configuration to deploy an AWS EC2 instance optimized for 
 - **Networking**: Creates a VPC on a given Region, subnet, routing table and attaches the EC2 instance to it.
 - **Security**: Automated Security Group creation with specific ingress rules for streaming protocols.
 - **Automated Key Management**: Generates an RSA 4096-bit SSH key pair locally.
----
+
 
 ## 🛠 Prerequisites
 
 - Terraform installed. [Install terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 - Ansible installed. Install python dependencies in `requirements.txt`.
 - AWS CLI configured with appropriate permissions.
----
+
 
 ## 📂 Project Structure
 
@@ -30,7 +30,7 @@ Terraform and Ansible configuration to deploy an AWS EC2 instance optimized for 
 - `ansible/ansible.cfg`: Local ansible configuration.
 - `ansible/templates/srt-relay.service.j2`: Defines the "SRT Relay" systemd service.
 - `ansible/templates/srt-relay.sh.j2`: Defines the script the systemd service run when started.
----
+
 
 ## 🚦 Getting Started
 
@@ -49,7 +49,7 @@ source venv/bin/activate
 ```
 pip install -r requirements.txt
 ```
----
+
 
 ### 🔧 Run Terraform
 1. Initialize Terraform
@@ -76,7 +76,7 @@ Terraform will generate a local file named video-relay (the private key). Use it
 ```bash
 chmod 400 video-relay
 ```
----
+
 
 ## 🔒 Run Ansible Playbook
 
@@ -104,6 +104,7 @@ ansible-playbook -i aws_ec2.yml srt-relay.yml -u ec2-user
 ```bash
 ansible tag_Video_stream_relay -i aws_ec2.yml -m shell -a "systemctl status srt-relay"
 ```
+
 
 ## 🧹 Clean up
 After testing you infrastructure make sure you destroy it to avoid a fat bill.
