@@ -1,0 +1,36 @@
+---
+- name: Update SRT Relay Server Ports
+  hosts: tag_Video_stream_relay
+  become: yes
+  vars:
+    srt_ports:
+      - 40159
+      - 40160
+    srt_latency: 250
+    srt_service_name: srt-relay
+
+  tasks:
+    - name: Update systemd service template with new ports
+      template:
+        src: srt-relay.service.j2
+        dest: /etc/systemd/system/{{ srt_service_name }}.service
+        mode: "0644"
+      notify: restart srt relay
+
+    - name: Deploy SRT relay script template with new ports
+      template:
+        src: srt-relay.sh.j2
+        dest: /usr/local/bin/srt-relay.sh
+        mode: "0755"
+      notify: restart srt relay
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+  handlers:
+    - name: restart srt relay
+      systemd:
+        name: "{{ srt_service_name }}"
+        state: restarted
+        daemon_reload: yes

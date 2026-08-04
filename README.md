@@ -105,6 +105,11 @@ ansible-playbook -i aws_ec2.yml srt-relay.yml -u ec2-user
 ansible tag_Video_stream_relay -i aws_ec2.yml -m shell -a "systemctl status srt-relay"
 ```
 
+[Optional] **Change the UDP ports
+```bash
+ansible-playbook -i aws_ec2.yml update_ports.yml                                      
+```
+
 
 ## 🧹 Clean up
 After testing you infrastructure make sure you destroy it to avoid a fat bill.
