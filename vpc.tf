@@ -69,9 +69,9 @@ resource "aws_security_group" "allow_udp" {
 resource "aws_vpc_security_group_ingress_rule" "allow_srt_ports" {
   security_group_id = aws_security_group.allow_udp.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 10000
+  from_port         = 40159
   ip_protocol       = "udp"
-  to_port           = 10005
+  to_port           = 40560
 }
 
 

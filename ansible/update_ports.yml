@@ -4,8 +4,8 @@
   become: yes
   vars:
     srt_ports:
-      - 40159
-      - 40160
+      - 40559
+      - 40560
     srt_latency: 250
     srt_service_name: srt-relay
 
